@@ -78,7 +78,7 @@ public class SignInService {
         String text = "Hi, thank you for your registration!" +
                 "\n\nThis is your confirmation code : " + getConfirmation() + ".\n\nDo not share it";
 
-        message.setFrom("matlab.abbaszada@gmail.com");
+        message.setFrom("FROM_WHICH_EMAIL");
         message.setTo(dto.getEmail());
         message.setText(text);
         message.setSubject(subject);
