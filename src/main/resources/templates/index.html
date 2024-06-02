@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .confirmation-container {
+            display: none;
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: #f44336;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Sign In</h2>
+    <form id="signInForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <label for="passConfirm">Confirm Password:</label>
+        <input type="password" id="passConfirm" name="passConfirm" required><br><br>
+        <button type="submit">Sign In</button>
+        <div id="errorMessage" class="error-message"></div>
+    </form>
+</div>
+
+<div class="confirmation-container" id="confirmationContainer" style="display: none;">
+    <h2>Email Confirmation</h2>
+    <form id="confirmationForm">
+        <label for="confirmationCode">Confirmation Code:</label>
+        <input type="text" id="confirmationCode" name="confirmationCode" required><br><br>
+        <button type="submit">Confirm Email</button>
+        <div id="confirmationMessage" class="error-message"></div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('signInForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+        fetch('/account/sign-in', {
+            method: 'POST',
+            body: JSON.stringify({
+                email: formData.get('email'),
+                password: formData.get('password'),
+                passConfirm: formData.get('passConfirm')
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                if (data.startsWith("Please") || data.startsWith("Invalid")) {
+                    document.getElementById('errorMessage').innerText = data;
+                } else {
+                    document.getElementById('confirmationContainer').style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('confirmationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+        fetch('/account/confirm-email', {
+            method: 'POST',
+            body: JSON.stringify({
+                confirmation: formData.get('confirmationCode')
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                document.getElementById('confirmationMessage').innerText = data;
+            })
+            .catch(error => console.error('Error:', error));
+    });
+</script>
+</body>
+</html>
